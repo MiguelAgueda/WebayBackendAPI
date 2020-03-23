@@ -12,31 +12,47 @@ u_tools = UserDBTools()
 u_tools.local = True
 
 # instantiate the app
-app = Flask(__name__, static_folder='/static')
-app.config.from_object(__name__)
+app = Flask(__name__,
+            static_folder="./dist/static",
+            template_folder="./dist")
+# app.config.from_object(__name__)
 
 
 # enable CORS
-CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(app, resources={r'/api/*': {'origins': '*'}})
 
-@app.route('/sample')
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return render_template("index.html")
+
+@app.route('/api/sample')
 def sample():
     try:
         return render_template('index.html')
-    except TemplateNotFound:
+    except:
         return jsonify("Template Not Found!")
 
-@app.route('/signup', methods=['GET', 'POST'])
+
+@app.route('/api/signup', methods=['GET', 'POST'])
 def create_user():
-    response = {'status': 'success'}
+    response={'status': 'success'}
     if request.method == 'POST':
-        user_data = request.get_json()
+        user_data=request.get_json()
+        username = user_data['username']
+        password = user_data['password']
+        if u_tools._username_exists(username):
+            response['valid'] = 'false'
+        else:
+            if u_tools.create_user(username, password):
+                response['valid'] = 'true'
     return jsonify(response)
 
-@app.route('/login', methods=['POST'])
+
+@app.route('/api/login', methods=['POST'])
 def user_login():
-    response = {'recieved': 'true'}
-    user_data = request.get_json()
+    response={'recieved': 'true'}
+    user_data=request.get_json()
     if u_tools.login_user(user_data.get('username'),
                           user_data.get('password')):
         response['valid'] = 'true'
@@ -44,18 +60,12 @@ def user_login():
         response['valid'] = 'false'
     return jsonify(response)
 
-@app.route('/dbTest', methods=['GET'])
-def db_test():
-    date = datetime.now()
-    returner = {"data": "Wow"}
-    # return jsonify("WOW")
-    # return jsonify(returner)
-    return jsonify(date)
 
-@app.route('/ping', methods=['GET'])
+
+@app.route('/api/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong!')
 
 
 if __name__ == '__main__':
-    app.run(port=8080, debug=True)
+    app.run(port=8080)
