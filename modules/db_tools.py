@@ -70,7 +70,7 @@ class UserDBTools(BaseDBTools):
         """Hash `no_crypt_password` using one-way hashing algorithm."""
         hash_name = "sha256"
         password = salt + no_crypt_password.encode('utf-8')
-        iterations = 1000000
+        iterations = 100000
         dk_len = 128
 
         dk = pbkdf2_hmac(hash_name, password, salt, iterations, dk_len)
