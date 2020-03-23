@@ -1,10 +1,8 @@
-from flask import Flask, jsonify, request, Blueprint, render_template, abort
+from flask import Flask, jsonify, request, Blueprint, render_template
 from flask_cors import CORS
 from datetime import datetime
 from modules.db_tools import UserDBTools
-from jinja2 import TemplateNotFound
 
-from view import sample_page
 
 # configuration
 DEBUG = True
@@ -16,7 +14,6 @@ u_tools.local = True
 # instantiate the app
 app = Flask(__name__, static_folder='/static')
 app.config.from_object(__name__)
-@app.register_blueprint(sample_page)
 
 
 # enable CORS
