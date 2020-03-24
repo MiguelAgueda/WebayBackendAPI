@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Blueprint, render_template
+from flask import Flask, jsonify, request, Blueprint, render_template, send_file
 from flask_cors import CORS
 from datetime import datetime
 from modules.db_tools import UserDBTools
@@ -27,9 +27,9 @@ CORS(app, resources={r'/api/*': {'origins': '*'}})
 def catch_all(path):
     return render_template("index.html")
 
-@app.route('/favicon.ico', methods=['GET'])
-def get_icon():
-    return
+# @app.route('/favicon.ico', methods=['GET'])
+# def get_icon():
+#     return send_file('dist/static/assets/logo.png', mimetype='image/png')
 
 @app.route('/api/sample')
 def index():
