@@ -6,11 +6,11 @@ import requests
 
 
 # configuration
-DEBUG = True
+DEBUG = False
 
 # instantiate database connection.
 u_tools = UserDBTools()
-u_tools.local = True
+u_tools.local = False
 
 # instantiate the app
 app = Flask(__name__,
@@ -68,4 +68,4 @@ def ping_pong():
 
 
 if __name__ == '__main__':
-    app.run(port=8080)
+    app.run()
