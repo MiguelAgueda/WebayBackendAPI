@@ -27,6 +27,10 @@ CORS(app, resources={r'/api/*': {'origins': '*'}})
 def catch_all(path):
     return render_template("index.html")
 
+@app.route('/favicon.ico', methods=['GET'])
+def get_icon():
+    return
+
 @app.route('/api/sample')
 def index():
     r = requests.get('http://httpbin.org/status/418')
