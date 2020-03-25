@@ -1,2 +1,2 @@
 runtime: python37
-web: gunicorn main:app --log-file=-
+entrypoint: gunicorn main:app --log-file=-
