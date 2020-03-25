@@ -189,7 +189,7 @@ class UserDBTools(BaseDBTools):
             return False
 
         result = self.client.db.users.delete_one({"_id": user__id})
-        if result.deleted_count is 0:
+        if result.deleted_count == 0:
             return False
 
         return True
@@ -288,7 +288,7 @@ class ForumDBTools(BaseDBTools):
             post["content"] = content
         result = self.client.db.forum.update_one(
             {"_id": post__id}, {"$set": post})
-        if result.matched_count is 0:
+        if result.matched_count == 0:
             return False
         else:
             return True
@@ -305,6 +305,6 @@ class ForumDBTools(BaseDBTools):
             - False: Delete was not sucessful.
         """
         result = self.client.db.forum.delete_one({"_id": post__id})
-        if result.deleted_count is not 1:
+        if result.deleted_count != 1:
             return False
         return True
