@@ -1,7 +1,9 @@
+.gitignore
 modules/__pycache__/db_tools.cpython-37.pyc
 env*
 .gcloudignore
 __pycache__/main.cpython-38.pyc
 __pycache__/main.cpython-36.pyc
 *.pyc
+modules/__pycache__/db_tools.cpython-37.pyc
 modules/__pycache__/db_tools.cpython-37.pyc

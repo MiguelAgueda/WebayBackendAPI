@@ -38,8 +38,8 @@ class BaseDBTools(object):
             db_user = os.environ.get('WEBAY_DB_USER')
             # Get DB password from environment var.
             db_pass = os.environ.get('WEBAY_DB_PASS')
-            assert db_user.len() > 0, "DB-Username not defined in environment."
-            assert db_pass.len() > 0, "DB-Password not defined in environment."
+            assert len(db_user) > 0, "DB-Username not defined in environment."
+            assert len(db_pass) > 0, "DB-Password not defined in environment."
             conn_str = F'mongodb+srv://{db_user}:{db_pass}@forumdb-wmmkf.mongodb.net/test?retryWrites=true&w=majority'
             self.client = MongoClient(
                 conn_str, connectTimeoutMS=5000, connect=True)
