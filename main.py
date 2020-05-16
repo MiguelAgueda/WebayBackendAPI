@@ -22,23 +22,18 @@ app = Flask(__name__,
 # enable CORS
 CORS(app, resources={r'/api/*': {'origins': '*'}})
 
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
     return render_template("index.html")
 
-@app.route('/api/sample')
-def index():
-    r = requests.get('http://httpbin.org/status/418')
-    print(r.text)
-    return jsonify(r.text)
-
 
 @app.route('/api/signup', methods=['GET', 'POST'])
 def create_user():
-    response={'status': 'success'}
+    response = {'status': 'success'}
     if request.method == 'POST':
-        user_data=request.get_json()
+        user_data = request.get_json()
         username = user_data['username']
         password = user_data['password']
         if u_tools._username_exists(username):
@@ -51,8 +46,8 @@ def create_user():
 
 @app.route('/api/login', methods=['POST'])
 def user_login():
-    response={'recieved': 'true'}
-    user_data=request.get_json()
+    response = {'recieved': 'true'}
+    user_data = request.get_json()
     if u_tools.login_user(user_data.get('username'),
                           user_data.get('password')):
         response['valid'] = 'true'
@@ -60,6 +55,35 @@ def user_login():
         response['valid'] = 'false'
     return jsonify(response)
 
+
+@app.route('/api/listings', methods=['GET'])
+# def get_listings():
+@app.route('/api/forum', methods=['GET'])
+def get_forum():
+    response = """{
+    "postid": 0,
+    "user":  "Vel"
+    "title": "What's an oatmeal?",
+    "content": "I need to know",
+    "replies": [
+      {
+        "replyid": 0,
+        "user": "Vel",
+        "content": "And why is it so thicc",
+        "replies": [
+          {
+            "replyid": 0,
+            "user": "Vel",
+            "content": "Seriously, i need to know"
+            "replies": [
+
+            ]
+          }
+        ]
+      }
+    ]
+  }"""
+    return jsonify(response)
 
 
 @app.route('/api/ping', methods=['GET'])
