@@ -38,12 +38,11 @@ class BaseDBTools(object):
             db_user = os.environ.get('WEBAY_DB_USER')
             # Get DB password from environment var.
             db_pass = os.environ.get('WEBAY_DB_PASS')
+            assert len(db_user) > 0, "DB-Username not defined in environment."
+            assert len(db_pass) > 0, "DB-Password not defined in environment."
             conn_str = F'mongodb+srv://{db_user}:{db_pass}@forumdb-wmmkf.mongodb.net/test?retryWrites=true&w=majority'
             self.client = MongoClient(
                 conn_str, connectTimeoutMS=5000, connect=True)
-            # print(F"{db_user} ::: {db_pass}")
-
-        # self.local = local
 
 
 class UserDBTools(BaseDBTools):
@@ -189,7 +188,7 @@ class UserDBTools(BaseDBTools):
             return False
 
         result = self.client.db.users.delete_one({"_id": user__id})
-        if result.deleted_count is 0:
+        if result.deleted_count == 0:
             return False
 
         return True
@@ -288,7 +287,7 @@ class ForumDBTools(BaseDBTools):
             post["content"] = content
         result = self.client.db.forum.update_one(
             {"_id": post__id}, {"$set": post})
-        if result.matched_count is 0:
+        if result.matched_count == 0:
             return False
         else:
             return True
@@ -305,6 +304,6 @@ class ForumDBTools(BaseDBTools):
             - False: Delete was not sucessful.
         """
         result = self.client.db.forum.delete_one({"_id": post__id})
-        if result.deleted_count is not 1:
+        if result.deleted_count != 1:
             return False
         return True

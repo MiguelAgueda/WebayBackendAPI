@@ -1,2 +1,11 @@
 runtime: python37
-entrypoint: gunicorn -b :8080 main:app
+env: flex
+entrypoint: gunicorn main:app --log-file=-
+# # entrypoint: gunicorn -b :$PORT main:app
+
+# runtime: python
+# env: flex
+# entrypoint: gunicorn -b :$PORT main:app
+
+runtime_config:
+  python_version: 3
