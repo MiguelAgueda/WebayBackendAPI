@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Blueprint, render_template
+from flask import Flask, jsonify, request, Blueprint, render_template, send_file
 from flask_cors import CORS
 from datetime import datetime
 from modules.db_tools import UserDBTools
@@ -6,11 +6,11 @@ import requests
 
 
 # configuration
-DEBUG = True
+DEBUG = False
 
 # instantiate database connection.
 u_tools = UserDBTools()
-u_tools.local = True
+u_tools.local = False
 
 # instantiate the app
 app = Flask(__name__,
@@ -27,6 +27,17 @@ CORS(app, resources={r'/api/*': {'origins': '*'}})
 @app.route('/<path:path>')
 def catch_all(path):
     return render_template("index.html")
+
+# @app.route('/favicon.ico', methods=['GET'])
+# def get_icon():
+#     return send_file('dist/static/assets/logo.png', mimetype='image/png')
+
+
+@app.route('/api/sample')
+def index():
+    r = requests.get('http://httpbin.org/status/418')
+    print(r.text)
+    return jsonify(r.text)
 
 
 @app.route('/api/signup', methods=['GET', 'POST'])
@@ -92,4 +103,4 @@ def ping_pong():
 
 
 if __name__ == '__main__':
-    app.run(port=8080)
+    app.run()
