@@ -28,13 +28,13 @@ class WebayForumData
 {
 	// Perhaps change all functions that check if memory is full to from void to bool or int to return if it was successful
 	public:
-		void addOPPost(const std::string&, const std::string&, const std::string&);
+		void addOppost(const std::string&, const std::string&, const std::string&);
 		void addReplyPost(const int&, const int[], const std::string&, const std::string&);
 
-		void deleteOPPost(const int&);
+		void deleteOpPost(const int&);
 		void deleteReplyPost(const int&, const int[]);
 
-		void modifyOPPost(const int&, const std::string&);
+		void modifyOpPost(const int&, const std::string&);
 		void modifyReplyPost(const int&, const int[], const std::string&);
 
 		void searchPostTitle(const std::string&);
@@ -43,12 +43,11 @@ class WebayForumData
 		void reserveListSpace();
 		void destroyData();
 
-		std::shared_ptr<ForumPostNode> findReply(const int&, const int OPId[]);
+		std::shared_ptr<ForumPostNode> findReply(const int&, const int[]);
 
 	private:
-		// int post ID, string post title, OPPTR op pointer
-		std::vector<std::unique_ptr<ForumOP>> forumOPList;
-		std::vector<int> deletedOP;
+		std::vector<std::unique_ptr<ForumOP>> forumOpList;
+		std::vector<int> deletedOp;
 		bool full();
 };
 
