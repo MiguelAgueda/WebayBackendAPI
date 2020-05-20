@@ -5,6 +5,7 @@ import os
 from hashlib import pbkdf2_hmac
 from datetime import datetime
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 
 class BaseDBTools(object):
@@ -115,7 +116,8 @@ class UserDBTools(BaseDBTools):
                                                          {"_id": 0, "hash": 1, "salt": 1})
             user_hash = user_secrets["hash"]
             print(F"User Hash: {user_hash}")
-            uncertain_hash, _ = self._hash_pass(password, salt=user_secrets["salt"])
+            uncertain_hash, _ = self._hash_pass(
+                password, salt=user_secrets["salt"])
             print(F"Uncertain Hash: {uncertain_hash}")
             if uncertain_hash == user_secrets["hash"]:
                 return True
@@ -216,8 +218,8 @@ class ForumDBTools(BaseDBTools):
         Create a new forum post. 
 
         Parameters:
-            - author__id: '_id' object of author.
-            - content: String object of post's content.
+            - author: Username of author.
+            - content: Post's content.
             - (opt) title: String object of a root-post title.
             - (opt) parent__id: '_id' object of a response-post's parent.
 
@@ -228,18 +230,24 @@ class ForumDBTools(BaseDBTools):
         if parent__id:
             if title:
                 raise AttributeError("Response post should not have a title.")
-            post = self._response(parent__id, author__id, content)
+            new_reply = self._response(parent__id, author__id, content)
+            # existing_replies = self.client.db.forum.find_one(
+            #     {"_id": parent__id}, {"_id": 0, "replies": 1})["replies"]
+            # existing_replies.append(new_reply)
+            result = self.client.db.forum.update_one(
+                {"_id": ObjectId(parent__id)}, {"$addToSet": {"replies": new_reply}})
 
         elif title:
             if parent__id:
                 raise AttributeError("Root post should not have a parent.")
             post = self._root(author__id, title, content)
+            result = self.client.db.forum.insert_one(post)
 
         else:
             raise AttributeError("Post must be root or response.")
 
-        result = self.client.db.forum.insert_one(post)
-        return result.inserted_id
+        # return result.inserted_id
+        return True
 
     def _root(self, author__id, title, content):
         """Helper function for creating root-posts."""
@@ -256,12 +264,12 @@ class ForumDBTools(BaseDBTools):
 
     def _response(self, parent__id, author__id, content):
         """Helper function for creating response-posts."""
-        auth_username = self.client.db.users.find_one({"_id": author__id},
-                                                      {"_id": 0, "username": 1})
+        # auth_username = self.client.db.users.find_one({"_id": author__id},
+        #                                               {"_id": 0, "username": 1})
         post = {
             "parent__id": parent__id,
             "author__id": author__id,
-            "author": auth_username,
+            # "username": auth_username.username,
             "date": datetime.now(),
             "content": content,
         }
@@ -307,3 +315,18 @@ class ForumDBTools(BaseDBTools):
         if result.deleted_count != 1:
             return False
         return True
+
+    def read_posts(self):
+        posts = list(self.client.db.forum.find(
+            {}, {"_id": 1, "username": 1, "title": 1, "content": 1, "replies": 1}))
+        print(posts)
+        for post in posts:
+            post["_id"] = str(post["_id"])
+        return posts
+        # print(jsonify(list(posts)))
+
+    def read_post(self, post_id):
+        post = self.client.db.forum.find_one(
+            {"_id": ObjectId(post_id)}, {"_id": 0, "username": 1, "title": 1, "content": 1})
+        print(F"\n\nThe Post: {post}\n\n")
+        return post
