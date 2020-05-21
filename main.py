@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, Blueprint, render_template, send_file
 from flask_cors import CORS
 from datetime import datetime
-from modules.db_tools import UserDBTools, ForumDBTools
+from modules.db_tools import UserDBTools, ForumDBTools, ListingDBTools
 import requests
 
 
@@ -13,13 +13,13 @@ u_tools = UserDBTools()
 u_tools.local = False
 f_tools = ForumDBTools()
 f_tools.local = False
+l_tools = ListingDBTools()
+l_tools.local = False
 
 # instantiate the app
 app = Flask(__name__,
             static_folder="./dist/static",
             template_folder="./dist")
-# app.config.from_object(__name__)
-
 
 # enable CORS
 CORS(app, resources={r'/api/*': {'origins': '*'}})
@@ -29,10 +29,6 @@ CORS(app, resources={r'/api/*': {'origins': '*'}})
 @app.route('/<path:path>')
 def catch_all(path):
     return render_template("index.html")
-
-# @app.route('/favicon.ico', methods=['GET'])
-# def get_icon():
-#     return send_file('dist/static/assets/logo.png', mimetype='image/png')
 
 
 @app.route('/api/signup', methods=['GET', 'POST'])
@@ -62,24 +58,56 @@ def user_login():
     return jsonify(response)
 
 
-@app.route('/api/listings', methods=['GET'])
-# def get_listings():
+@app.route('/api/listings/get_listings', methods=['GET'])
+def get_listings():
+    print("Getting Listings. Debugging!")
+    listings = l_tools.read_listing()  # No parameter returns all listings.
+    print(F"Listings: {listings}")
+    return jsonify(listings)
+
+
+@app.route('/api/listings/get_listing', methods=['POST'])
+def get_listing():
+    data = request.get_json()
+    print(F"data: {data}")
+    listing = l_tools.read_listing(_id=data["id"])
+    return jsonify(listing)
+
+
+@app.route('/api/listings/create_listing', methods=['POST'])
+def create_listing():
+    data = request.get_json()
+    print(F"Data from request: {data}")
+    l_tools.create_listing(
+        data["title"], data["description"], data["condition"], data["price"])
+    return ''
+
+
+@app.route('/api/listings/edit_listing', methods=['POST'])
+def edit_listing():
+    data = request.get_json()
+    l_tools.update_listing(
+        data["_id"], data["title"], data["description"], data["condition"], data["price"])
+    return ''
+
+
+@app.route('/api/listings/delete_listing', methods=['POST'])
+def delete_listing():
+    data = request.get_json()
+    l_tools.delete_listing(data["_id"])
+    return ''
+
+
 @app.route('/api/forum/get_posts', methods=['GET'])
 def get_posts():
-    response = []
     posts = f_tools.read_posts()
-    # for post in posts:
-    #     post['_id'] = str(post['_id'])
-    #     # response.append(post)
-    # # return (jsonify(response))
     return jsonify(list(posts))
-    # return (jsonify({"_id": "5e752676e3f3f325e88f96fe", "content": "This is the content of a root post. This post should not have a parent__id attribute.", "title": "A Root Post"}))
 
 
 @app.route('/api/forum/get_post', methods=['POST'])
 def get_post():
     data = request.get_json()
-    print(F"The Data: {data}")
+    # print(F"The Data: {data}")
     post = f_tools.read_post(data['op_id'])
     return jsonify(post)
 

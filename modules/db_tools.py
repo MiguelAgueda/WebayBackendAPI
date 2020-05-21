@@ -52,7 +52,7 @@ class UserDBTools(BaseDBTools):
 
     Note:
         To connect to live database, set instance's 'local' attribute to False.
-        (UserDBTools Instance).local = False`
+        `(UserDBTools Instance).local = False`
 
     Available Functions:
         - create_user: Creates user with unique username.
@@ -319,14 +319,52 @@ class ForumDBTools(BaseDBTools):
     def read_posts(self):
         posts = list(self.client.db.forum.find(
             {}, {"_id": 1, "username": 1, "title": 1, "content": 1, "replies": 1}))
-        print(posts)
+        # print(posts)
         for post in posts:
             post["_id"] = str(post["_id"])
         return posts
-        # print(jsonify(list(posts)))
 
     def read_post(self, post_id):
         post = self.client.db.forum.find_one(
             {"_id": ObjectId(post_id)}, {"_id": 0, "username": 1, "title": 1, "content": 1})
-        print(F"\n\nThe Post: {post}\n\n")
+        # print(F"\n\nThe Post: {post}\n\n")
         return post
+
+
+class ListingDBTools(BaseDBTools):
+    def __init__(self):
+        super().__init__()
+
+    def create_listing(self, title, description, condition, price):
+        new_listing = {
+            "title": title,
+            "description": description,
+            "condition": condition,
+            "price": price
+        }
+        self.client.db.listings.insert_one(new_listing)
+
+    def read_listing(self, _id=None):
+        if _id:  # _id is defined, return a specific listing.
+            result = self.client.db.listings.find_one({"_id": ObjectId(_id)})
+            result["_id"] = str(result["_id"])
+
+        else:  # No _id specified, return all listings.
+            results = list(self.client.db.listings.find({}))
+            for result in results:
+                result["_id"] = str(result["_id"])
+            print(F"Results: {results}")
+            result = results
+
+        return result
+
+    def update_listing(self, _id, title, description, condition, price):
+        self.client.db.listings.update_one({"_id": ObjectId(_id)}, {"$set": {
+            "title": title,
+            "description": description,
+            "condition": condition,
+            "price": price,
+        }})
+
+    def delete_listing(self, _id):
+        self.client.db.listings.delete_one({"_id": ObjectId(_id)})
