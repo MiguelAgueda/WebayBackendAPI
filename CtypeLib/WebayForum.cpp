@@ -120,12 +120,12 @@ std::string WebayForumData::searchUserDirectReplies(const int& OpId, const std::
 			if (sortBy == 'o')
 			{
 				for (i = 0; i < matchIds.size(); i++)
-					replyStrings += recurReplies(matchIds[i], forumOpList[OpId]->replies[i]);
+					replyStrings += recurReplies(matchIds[i], forumOpList[OpId]->replies[matchIds[i]]);
 			}
 			else if (sortBy == 'n')
 			{
 				for (i = matchIds.size(); i > 0; i--)
-					replyStrings += recurReplies(matchIds[i - 1], forumOpList[OpId]->replies[i - 1]);
+					replyStrings += recurReplies(matchIds[i - 1], forumOpList[OpId]->replies[matchIds[i-1]]);
 			}
 		}
 		fullPost = "{\"postid\" : " + opPostId + ", \"user\" : \"" + opUser + "\", \"title\" : \"" + opTitle + "\", \"date\" : \"" + opDate + "\", \"time\" : \"" + opTime + "\", \"content\" : \"" + opContent + "\", \"replies\" : [" + replyStrings + "] }";
